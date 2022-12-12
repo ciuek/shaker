@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">shaker_p</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="btn">Zmierz</string>
+    <string name="hello_first_fragment">Przez 5 sekund powtarzaj ruch, aż do powiadomienia</string>
+</resources>
