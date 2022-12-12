@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     Toast.makeText(getBaseContext(), "Error: No Accelerometer.", Toast.LENGTH_LONG).show();
                 }
-                list2 = sm.getSensorList(Sensor.TYPE_MAGNETIC_FIELD);
+                list2 = sm.getSensorList(Sensor.TYPE_GYROSCOPE);
                 if(list2.size()>0){
                     sm.registerListener(sel2, list2.get(0), READINGRATE);
                 }
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 Toast.makeText(getBaseContext(), "Error: No Accelerometer.", Toast.LENGTH_LONG).show();
             }
-            list2 = sm.getSensorList(Sensor.TYPE_MAGNETIC_FIELD);
+            list2 = sm.getSensorList(Sensor.TYPE_GYROSCOPE);
             if(list2.size()>0){
                 sm.registerListener(sel2, list2.get(0), READINGRATE);
             }
