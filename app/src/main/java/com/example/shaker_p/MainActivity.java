@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (int x = 0; x < list.size(); x++)
             temp += list.get(x);
-            mean = temp/list.size();
+        mean = temp/list.size();
 
         for (int i = 0; i < list.size(); i++)
         {
@@ -90,6 +90,28 @@ public class MainActivity extends AppCompatActivity {
         std = Math.sqrt(meanOfDiffs);
 
         return min + " " + max + " " + mean + " " + std + " ";
+    }
+
+    private String avgVector(ArrayList<String> list) {
+        double[] params = new double[24];
+        for (String line : list) {
+            String[] arr = line.split(" ");
+            for (int i=0; i<arr.length; i++) {
+                params[i] += Double.parseDouble(arr[i]);
+            }
+        }
+
+        for(int i=0; i<params.length; i++)
+        {
+            params[i] = params[i]/list.size();
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        for (double param : params)
+            builder.append(param + " ");
+
+        return  builder.toString();
     }
 
     private void compareVectors(String x, String y) {
@@ -122,75 +144,72 @@ public class MainActivity extends AppCompatActivity {
         Button compare = findViewById(R.id.button_compare);
 
 
-        measure.setOnClickListener( new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                name = findViewById(R.id.name);
-                String namestring = name.getText().toString();
-                if(namestring.equals("")) {
-                    Toast.makeText(getBaseContext(), "Error: Enter your name.", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                sm = (SensorManager)getSystemService(SENSOR_SERVICE);
-
-                az = findViewById(R.id.azimuth);
-                pt = findViewById(R.id.pitch);
-
-                ACCx = new ArrayList<>();
-                ACCy = new ArrayList<>();
-                ACCz = new ArrayList<>();
-                GSCx = new ArrayList<>();
-                GSCy = new ArrayList<>();
-                GSCz = new ArrayList<>();
-
-                list1 = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
-                if(list1.size()>0){
-                    sm.registerListener(sel, list1.get(0), READINGRATE);
-                }else{
-                    Toast.makeText(getBaseContext(), "Error: No Accelerometer.", Toast.LENGTH_LONG).show();
-                }
-                list2 = sm.getSensorList(Sensor.TYPE_GYROSCOPE);
-                if(list2.size()>0){
-                    sm.registerListener(sel2, list2.get(0), READINGRATE);
-                }
-                else{
-                    Toast.makeText(getBaseContext(), "Error: No Gyroscope.", Toast.LENGTH_LONG).show();
-                }
-
-                new Handler().postDelayed(() -> {
-                    if(list1.size()>0){
-                        sm.unregisterListener(sel);
-                    }
-                    if(list2.size()>0){
-                        sm.unregisterListener(sel2);
-                    }
-
-                    File file = new File(Environment.getExternalStorageDirectory() + "/Documents/" + File.separator + namestring + ".txt");
-                    Context context = getApplicationContext();
-                    int duration = Toast.LENGTH_SHORT;
-                    try {
-                        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-
-                        writer.append(createVector(ACCx));
-                        writer.append(createVector(ACCy));
-                        writer.append(createVector(ACCz));
-                        writer.append(createVector(GSCx));
-                        writer.append(createVector(GSCy));
-                        writer.append(createVector(GSCz));
-                        writer.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Toast toast = Toast.makeText(context, e.toString(), duration);
-                        toast.show();
-                        System.out.println("An error has occured");
-                    }
-                    Toast toast = Toast.makeText(context, "file created: " + file, duration);
-                    toast.show();
-                    System.out.println("file created: " + file);
-                }, 5000);
+        measure.setOnClickListener(v -> {
+            name = findViewById(R.id.name);
+            String namestring = name.getText().toString();
+            if(namestring.equals("")) {
+                Toast.makeText(getBaseContext(), "Error: Enter your name.", Toast.LENGTH_LONG).show();
+                return;
             }
+
+            sm = (SensorManager)getSystemService(SENSOR_SERVICE);
+
+            az = findViewById(R.id.azimuth);
+            pt = findViewById(R.id.pitch);
+
+            ACCx = new ArrayList<>();
+            ACCy = new ArrayList<>();
+            ACCz = new ArrayList<>();
+            GSCx = new ArrayList<>();
+            GSCy = new ArrayList<>();
+            GSCz = new ArrayList<>();
+
+            list1 = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
+            if(list1.size()>0){
+                sm.registerListener(sel, list1.get(0), READINGRATE);
+            }else{
+                Toast.makeText(getBaseContext(), "Error: No Accelerometer.", Toast.LENGTH_LONG).show();
+            }
+            list2 = sm.getSensorList(Sensor.TYPE_GYROSCOPE);
+            if(list2.size()>0){
+                sm.registerListener(sel2, list2.get(0), READINGRATE);
+            }
+            else{
+                Toast.makeText(getBaseContext(), "Error: No Gyroscope.", Toast.LENGTH_LONG).show();
+            }
+
+            new Handler().postDelayed(() -> {
+                if(list1.size()>0){
+                    sm.unregisterListener(sel);
+                }
+                if(list2.size()>0){
+                    sm.unregisterListener(sel2);
+                }
+
+                File file = new File(Environment.getExternalStorageDirectory() + "/Documents/" + File.separator + namestring + ".txt");
+                Context context = getApplicationContext();
+                int duration = Toast.LENGTH_SHORT;
+                try {
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+
+                    writer.append(createVector(ACCx));
+                    writer.append(createVector(ACCy));
+                    writer.append(createVector(ACCz));
+                    writer.append(createVector(GSCx));
+                    writer.append(createVector(GSCy));
+                    writer.append(createVector(GSCz));
+                    writer.append('\n');
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast toast = Toast.makeText(context, e.toString(), duration);
+                    toast.show();
+                    System.out.println("An error has occured");
+                }
+                Toast toast = Toast.makeText(context, "file created: " + file, duration);
+                toast.show();
+                System.out.println("file created: " + file);
+            }, 5000);
         });
 
         compare.setOnClickListener(v -> {
@@ -201,14 +220,14 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/Documents/" + File.separator + namestring + ".txt");
-            StringBuilder text = new StringBuilder();
+            ArrayList<String> inputlist = new ArrayList<>();
 
             try {
                 BufferedReader br = new BufferedReader(new FileReader(file));
                 String line;
 
                 while ((line = br.readLine()) != null) {
-                    text.append(line);
+                    inputlist.add(line);
                 }
                 br.close();
             }
@@ -216,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            String input = text.toString();
+            String input = avgVector(inputlist);
 
             sm = (SensorManager)getSystemService(SENSOR_SERVICE);
 
